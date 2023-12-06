@@ -1,0 +1,30 @@
+﻿@page "/movie"
+
+<PageTitle>Movie</PageTitle>
+
+
+@if(movie == null)
+{
+    <Loading />
+}
+else
+{
+    <h1>Название фильма RU: @movie.NameRU</h1>
+    <h1>Название фильма EN: @movie.NameUS</h1>
+    <h4>Рейтинг: @movie.Rate</h4>
+    <ActorList actors = "movie.Actors"/>
+    <TagList tags = "movie.Tags"/>
+}
+
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string MovieId { get; set; }
+    public Movie? movie { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(() => movie = MoviesDb.getMovieById(MovieId));
+    }
+}

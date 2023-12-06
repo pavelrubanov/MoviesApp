@@ -1,0 +1,24 @@
+﻿<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>Тэги:</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tag in tags)
+            {
+                <tr>
+                    <td>
+                        <a href="/tag?TagId=@tag.Id" target="_blank">@tag.Name</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public List<Tag> tags { get; set; } = new();
+}

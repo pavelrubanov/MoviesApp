@@ -1,0 +1,24 @@
+﻿<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>Актеры:</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var actor in actors)
+            {
+                <tr>
+                    <td>
+                        <a href="/actor?ActorId=@actor.Id" target="_blank">@actor.Name</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public List<Actor> actors { get; set; } = new();
+}

@@ -1,0 +1,31 @@
+﻿<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>Name RU</th>
+                <th>Name US</th>
+                <th>Rate</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in movies)
+            {
+                <tr>
+                    <td>@movie.NameRU</td>
+                    <td>@movie.NameUS</td>
+                    <td>@movie.Rate</td>
+                    <td>
+                        <a href="/movie?MovieId=@movie.movieId" target="_blank">ссылка</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public List<Movie> movies { get; set; } = new();
+}

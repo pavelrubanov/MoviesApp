@@ -1,0 +1,29 @@
+﻿@page "/tag"
+
+<PageTitle>Tag</PageTitle>
+
+
+@if(tag == null)
+{
+    <Loading />
+}
+else
+{
+    <h1>Тэг: @tag.Name</h1>
+    <h4>Список фильмов:</h4>
+    <MoviesList movies="tag.Movies"/>
+    
+}
+
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string TagId { get; set; }
+    public Tag? tag { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(() => tag = MoviesDb.getTagById(TagId));
+    }
+}

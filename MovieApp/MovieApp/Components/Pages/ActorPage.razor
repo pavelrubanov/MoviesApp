@@ -1,0 +1,28 @@
+﻿@page "/actor"
+
+<PageTitle>Actor</PageTitle>
+
+
+@if(actor == null)
+{
+    <Loading />
+}
+else
+{
+    <h1>@actor.Name</h1>
+    <h4>Список фильмов:</h4>
+    <MoviesList movies="actor.Movies"/>
+}
+
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string ActorId { get; set; }
+    public Actor? actor { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(() => actor = MoviesDb.getActorById(ActorId));
+    }
+}

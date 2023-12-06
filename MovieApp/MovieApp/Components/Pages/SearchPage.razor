@@ -1,0 +1,75 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>Search</PageTitle>
+
+<div class="search-container">
+    <input class="search-input" @bind="searchQuery" placeholder="Введите название фильма, актера или тэга" />
+
+    <InputSelect class="form-select" id="category" @bind-Value="category">
+        <option value="">--Выберите категорию--</option>
+        <option value="movie">Фильм</option>
+        <option value="actor">Актер</option>
+        <option value="tag">Тэг</option>
+    </InputSelect>
+
+    <button class="btn btn-primary search-btn" @onclick="SearchFunc">Поиск</button>
+</div>
+
+
+
+
+@if (SearchInProgress)
+{
+    <Loading />
+}
+else if (category == "movie" && findedMovies != null)
+{
+    <MoviesList movies="findedMovies" />
+}
+else if (category == "actor" && findedActors != null)
+{
+    <ActorList actors="findedActors" />
+}
+else if (category == "tag" && findedTags != null)
+{
+    <TagList tags="findedTags" />
+}
+
+
+@code {
+    private string searchQuery;
+    private List<Movie>? findedMovies;
+    private List<Actor>? findedActors;
+    private List<Tag>? findedTags;
+    private bool SearchInProgress = false;
+    private string? category;
+    private int number = 30;
+
+    private async Task SearchFunc()
+    {
+        SearchInProgress = true;
+        if (!string.IsNullOrEmpty(category) && !string.IsNullOrEmpty(searchQuery))
+        {
+            switch (category)
+            {
+                case "movie":
+                    {
+                        await Task.Run(() => findedMovies = MoviesDb.FindMovies(searchQuery, number));
+                        break;
+                    }
+                case "actor":
+                    {
+                        await Task.Run(() => findedActors = MoviesDb.FindActors(searchQuery, number));
+                        break;
+                    }
+                case "tag":
+                    {
+                        await Task.Run(() => findedTags = MoviesDb.FindTags(searchQuery, number));
+                        break;
+                    }
+            }
+        }
+        SearchInProgress = false;
+    }
+}
