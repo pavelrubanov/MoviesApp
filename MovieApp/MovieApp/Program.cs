@@ -1,4 +1,4 @@
-using MovieApp.Client.Pages;
+using MovieApp.Client;
 using MovieApp.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,7 +29,7 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Counter).Assembly);
+    .AddInteractiveWebAssemblyRenderMode();
+    //.AddAdditionalAssemblies(typeof(Counter).Assembly);
 
 app.Run();

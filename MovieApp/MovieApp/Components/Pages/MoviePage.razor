@@ -1,19 +1,40 @@
 ﻿@page "/movie"
+@rendermode InteractiveServer 
 
 <PageTitle>Movie</PageTitle>
 
 
-@if(movie == null)
+@if(Loading)
 {
     <Loading />
 }
 else
 {
-    <h1>Название фильма RU: @movie.NameRU</h1>
-    <h1>Название фильма EN: @movie.NameUS</h1>
+    <h1>@movie.NameRU</h1>
+    <h1>@movie.NameUS</h1>
     <h4>Рейтинг: @movie.Rate</h4>
-    <ActorList actors = "movie.Actors"/>
-    <TagList tags = "movie.Tags"/>
+    <div style="display: flex; flex-direction: row; width: 100%;">
+
+        <div style="max-height: 410px; overflow-y: auto; margin-right: 20px; flex: 1; border: 1px solid black;">
+            <ActorList actors="movie.Actors" />
+        </div>
+
+        <div style="max-height: 410px; overflow-y: auto; margin-right: 20px; flex: 1; border: 1px solid black;">
+            <TagList tags="movie.Tags" />
+        </div>
+        
+    </div>
+    <p></p>
+    <h4>Похожие фильмы:</h4>
+    <button class="btn btn-primary search-btn" @onclick="GenerateSimilarMovies">Найти</button>
+    @if (GenerateSimilarMoviesInProgress)
+    {
+        <Loading/>
+    }
+    else if (SimilarMovies.Count > 0)
+    {
+        <MoviesList movies="SimilarMovies" />
+    }
 }
 
 
@@ -22,9 +43,23 @@ else
     [SupplyParameterFromQuery]
     public string MovieId { get; set; }
     public Movie? movie { get; set; }
+    public List<Movie> SimilarMovies { get; set; } = new();
+    private bool Loading = true;
+    public bool GenerateSimilarMoviesInProgress = false;
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Run(() => movie = MoviesDb.getMovieById(MovieId));
+
+        Loading = false;
+    }
+    private async Task GenerateSimilarMovies()
+    {
+        if (!GenerateSimilarMoviesInProgress)
+        {
+            GenerateSimilarMoviesInProgress = true;
+            await Task.Run(() => SimilarMovies = MoviesDb.GenerateSimilarForMovie(movie));
+            GenerateSimilarMoviesInProgress = false;
+        } 
     }
 }

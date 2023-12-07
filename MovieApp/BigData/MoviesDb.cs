@@ -31,6 +31,45 @@ namespace MoviesData
             db.Movies.AddRange(parser.movies.Values);
             db.SaveChanges();
         }
+        public static List<Movie> GenerateSimilarForMovie(Movie movie)
+        {
+            using var db = new ApplicationContext();
+
+
+            List<Movie> list = movie.Actors.SelectMany(actor => getActorById(actor.Id).Movies)
+                            .Union(movie.Tags.SelectMany(tag => getTagById(tag.Id).Movies))
+                            .Where(movie => !string.IsNullOrEmpty(movie.movieId))
+                            .DistinctBy(movie => movie.movieId)
+                            .ToList();
+
+            if (list ==null || list.Count == 1 || list.Count == 0)
+            {
+                return new();
+            }
+
+            //deleting the current movie
+            list.Remove(movie);
+
+            var Comparer = new MovieSimilarComparer(movie);
+            List<Movie> result = new();
+
+            //take top 10 similar movies
+            for (int i = 0; i < 10; i++)
+            {
+                Movie? maxMovie = list[0];
+                foreach (var m in list)
+                {
+                    if (Comparer.Compare(m, maxMovie) == 1)
+                    {
+                        maxMovie = m;
+                    }
+                }
+                list.Remove(maxMovie);
+                result.Add(maxMovie);
+            }
+
+            return result;
+        }
 
         /// <param name="id">movieId(not IMDB id)</param>
         /// <returns>Returns the movie by its movieId. The result may be NULL</returns>

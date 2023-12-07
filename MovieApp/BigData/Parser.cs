@@ -20,40 +20,40 @@ namespace MoviesData
         public Dictionary<string, Actor> actors { get; private set; } = new();
         public Dictionary<string, Tag> tags { get; private set; } = new();
         
-        private void GenerateSimilarForAllMovies(BlockingCollection<Movie> movies)
-        {
-            foreach (var movie in movies.GetConsumingEnumerable())
-            {
-                List <Movie> list = movie.Actors.SelectMany(actor => actorsMovies.GetValueOrDefault(actor))
-                             .Union(movie.Tags.SelectMany(tag => tagsMovies.GetValueOrDefault(tag)))
-                             .Where(movie => !movie.movieId.IsNullOrEmpty())
-                             .DistinctBy(movie => movie.movieId)
-                             .ToList();
+        //private void GenerateSimilarForAllMovies(BlockingCollection<Movie> movies)
+        //{
+        //    foreach (var movie in movies.GetConsumingEnumerable())
+        //    {
+        //        List <Movie> list = movie.Actors.SelectMany(actor => actorsMovies.GetValueOrDefault(actor))
+        //                     .Union(movie.Tags.SelectMany(tag => tagsMovies.GetValueOrDefault(tag)))
+        //                     .Where(movie => !movie.movieId.IsNullOrEmpty())
+        //                     .DistinctBy(movie => movie.movieId)
+        //                     .ToList();
 
-                //deleting the current movie
-                list.Remove(movie); ;
+        //        //deleting the current movie
+        //        list.Remove(movie); ;
 
-                var Comparer = new MovieSimilarComparer(movie);
-                List<Movie> result = new();
+        //        var Comparer = new MovieSimilarComparer(movie);
+        //        List<Movie> result = new();
 
-                //take top 10 similar movies
-                for (int i = 0; i < 10; i++)
-                {
-                    Movie? maxMovie = list[0];
-                    foreach(var m in list)
-                    {
-                        if (Comparer.Compare(m, maxMovie) == 1)
-                        {
-                            maxMovie = m;
-                        }
-                    }
-                    list.Remove(maxMovie);
-                    result.Add(maxMovie);
-                }
+        //        //take top 10 similar movies
+        //        for (int i = 0; i < 10; i++)
+        //        {
+        //            Movie? maxMovie = list[0];
+        //            foreach(var m in list)
+        //            {
+        //                if (Comparer.Compare(m, maxMovie) == 1)
+        //                {
+        //                    maxMovie = m;
+        //                }
+        //            }
+        //            list.Remove(maxMovie);
+        //            result.Add(maxMovie);
+        //        }
 
-                movie.SimilarMovies = result;
-            }
-        }
+        //        movie.SimilarMovies = result;
+        //    }
+        //}
         private void ReadMovieCodes_IMDB(BlockingCollection<string> lines)
         {
             string filePath = "..\\..\\..\\ml-latest\\MovieCodes_IMDB.tsv";

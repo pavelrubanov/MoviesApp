@@ -14,7 +14,6 @@ namespace MoviesData.Models
         public string? NameUS { get; set; }
         public List<Actor> Actors = new();
         public List<Tag> Tags = new();
-        public List<Movie> SimilarMovies = new();
         public double? Rate { get; set; }
         public string? imdbId { get; set; }
         [Key] public string movieId { get; set; }
@@ -28,19 +27,25 @@ namespace MoviesData.Models
         /// <returns>Similarity coefficient from 0 to 1</returns>
         public double Similarity(Movie movie)
         {
-            int actorsIntersect = Actors.Intersect(movie.Actors).Count();
-            int actorsUnion = Actors.Union(movie.Actors).Count();
+            double actorsIntersect = Actors.Select(a => a.Id)
+                .Intersect(movie.Actors.Select(a => a.Id))
+                .Count();
+            //int actorsUnion = Actors.Union(movie.Actors).Count();
+            double actorsUnion = Actors.Count;
 
-            int tagsIntersect = Tags.Intersect(movie.Tags).Count();
-            int tagsUnion = Tags.Union(movie.Tags).Count();
+            double tagsIntersect = Tags.Select(t => t.Id)
+                .Intersect(movie.Tags.Select(t => t.Id))
+                .Count();
+            //int tagsUnion = Tags.Union(movie.Tags).Count();
+            double tagsUnion = Tags.Count;
 
-            double actorsRate;
+            double actorsRate; //from 0 to 1
             if (actorsUnion != 0)
                 actorsRate = actorsIntersect / actorsUnion;
             else
                 actorsRate = 0;
 
-            double tagsRate;
+            double tagsRate; //from 0 to 1
             if (tagsUnion != 0)
                 tagsRate = tagsIntersect / tagsUnion;
             else
@@ -48,13 +53,16 @@ namespace MoviesData.Models
 
             double rate = (actorsRate + tagsRate) * 0.5;
 
-            double anotherMovieRate = 0;
+            double anotherMovieRate = 0; //from 0 to 10
 
             if (movie.Rate != null)
             {
-                anotherMovieRate = (double)movie.Rate * 0.05;
+                anotherMovieRate = (double)movie.Rate;
             }
-            double resultRate = rate * 0.5 + anotherMovieRate;
+
+            //90% - similar actors and tags, 10% - rate
+            double resultRate = rate * 0.9 + (anotherMovieRate * 0.1) * 0.1;
+            
 
             return resultRate;
         }
